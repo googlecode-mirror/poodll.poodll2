@@ -147,6 +147,22 @@ function filter_poodll_callback(array $link){
 			$returnHtml="<BR />" . fetch_poodllcalc($filterprops['runtime'],!empty($filterprops['width']) ? $filterprops['width'] : 300,
 				!empty($filterprops['height']) ? $filterprops['height'] : 400);
 			break;
+		
+		case 'quizlet':
+			$returnHtml= fetch_quizlet($filterprops['id'],
+				!empty($filterprops['title']) ? $filterprops['title']  : 'quizlet',
+				!empty($filterprops['mode']) ? $filterprops['mode'] :  'familiarize',
+				!empty($filterprops['width']) ? $filterprops['width'] :  '100%',
+				!empty($filterprops['height']) ? $filterprops['height'] :  '310')
+				;
+			break;	
+			
+		case 'sliderocket':
+			$returnHtml= fetch_sliderocket($filterprops['id'],
+				!empty($filterprops['width']) ? $filterprops['width'] :  '400',
+				!empty($filterprops['height']) ? $filterprops['height'] :  '326')
+				;
+			break;	
 
 		case 'teachersrecorder':
 			$returnHtml="<BR />" . fetch_teachersrecorder($filterprops['runtime'],$filterprops['savepath'], "");
