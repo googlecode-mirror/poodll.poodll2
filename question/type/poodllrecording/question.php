@@ -49,6 +49,7 @@ class qtype_poodllrecording_question extends question_with_responses {
      */
     public function get_format_renderer(moodle_page $page) {
         return $page->get_renderer('qtype_poodllrecording', 'format_' . $this->responseformat);
+      // return $page->get_renderer('qtype_poodllrecording', 'format_video');
     }
 	
 	/**
@@ -85,9 +86,7 @@ class qtype_poodllrecording_question extends question_with_responses {
 
     public function is_same_response(array $prevresponse, array $newresponse) {
         return question_utils::arrays_same_at_key_missing_is_blank(
-                $prevresponse, $newresponse, 'answer') && ($this->attachments == 0 ||
-                question_utils::arrays_same_at_key_missing_is_blank(
-                $prevresponse, $newresponse, 'attachments'));
+                $prevresponse, $newresponse, 'answer');
     }
 
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
@@ -95,7 +94,10 @@ class qtype_poodllrecording_question extends question_with_responses {
         if ($component == 'question' && $filearea == 'response_answer') {
 		   //since we will put files in respnse_answer, this is likely to be always true.
 		   return true;
-		 
+		  
+		  //if we are showing a whiteboard backimage, there is no need to restrict here
+		 } else if ($component == 'qtype_poodllrecording' && $filearea == 'backimage') {
+			return true;
 			
         } else if ($component == 'qtype_poodllrecording' && $filearea == 'graderinfo') {
             return $options->manualcomment;

@@ -91,12 +91,37 @@ function xmldb_qtype_poodllrecording_upgrade($oldversion) {
     // Moodle v2.3.0 release upgrade line
     // Put any upgrade step following this
     
-    if ($oldversion < 2012061600) {
+    if ($oldversion < 2012062700) {
     	$table = new xmldb_table('qtype_poodllrecording_options');	
-		$dbman->rename_table( $table, 'qtype_poodllrecording_opts', true, true);   
-    	
-    	// poodllrecording savepoint reached
-        upgrade_plugin_savepoint(true, 2012061600, 'qtype', 'poodllrecording');
+		if ($dbman->table_exists($table)){
+			$dbman->rename_table( $table, 'qtype_poodllrecording_opts', $continue=true, $feedback=true);   
+        }
+		 // poodllrecording savepoint reached
+        upgrade_plugin_savepoint(true, 2012062700, 'qtype', 'poodllrecording');
+    
+    }
+    
+    // Added whiteboard and related fields 20120814
+    // Put any upgrade step following this
+    
+    if ($oldversion < 2012081400) {
+    	// Define field questiontextformat to be added to question_order_sub
+        $table = new xmldb_table('qtype_poodllrecording_opts');
+        $field1 = new xmldb_field('backimage', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'graderinfoformat');
+		$field2 = new xmldb_field('boardsize', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'backimage');
+
+        // Conditionally  add backimage field
+        if (!$dbman->field_exists($table, $field1)) {
+            $dbman->add_field($table, $field1);
+        }
+        
+        // Conditionally add boardsize field
+        if (!$dbman->field_exists($table, $field2)) {
+            $dbman->add_field($table, $field2);
+        }
+        
+		 // poodllrecording savepoint reached
+        upgrade_plugin_savepoint(true, 2012081400, 'qtype', 'poodllrecording');
     
     }
 

@@ -194,11 +194,60 @@ class qtype_poodllrecording_format_audio_renderer extends plugin_renderer_base {
 		$ret .= html_writer::empty_tag('input', array('type' => 'hidden','name' => $inputname . 'format', 'value' => 1));
 	
 	
-		//the context id $context->id here is wrong, so we just use "5" because it works, why is it wrong ..? J 20120214
+		//the context id is the user context for a student submission
 		return $ret . fetchAudioRecorderForSubmission('swf','question',$inputid, $usercontextid ,'user','draft',$draftitemid);
 		return $ret;
     }
 }
+
+
+/**
+ * An poodllrecording format renderer for poodllrecordings for MP3 
+ *
+ * @copyright  2012 Justin Hunt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_poodllrecording_format_mp3_renderer extends qtype_poodllrecording_format_audio_renderer {
+   
+
+    protected function class_name() {
+        return 'qtype_poodllrecording_mp3';
+    }
+
+
+
+
+
+    public function response_area_input($name, $qa, $step, $lines, $context) {
+    	global $USER;
+    	$usercontextid=get_context_instance(CONTEXT_USER, $USER->id)->id;
+    	
+		//prepare a draft file id for use
+		list($draftitemid, $response) = $this->prepare_response_for_editing( $name, $step, $context);
+		
+		//prepare the tags for our hidden( or shown ) input
+		$inputname = $qa->get_qt_field_name($name);
+		//$inputname="answer";
+		$inputid =  $inputname . '_id';
+		
+		//our answerfield
+		$ret =	html_writer::empty_tag('input', array('type' => 'hidden','id'=>$inputid, 'name' => $inputname));
+		//this is just for testing purposes so we can see the value the recorder is writing
+		//$ret = $this->textarea($step->get_qt_var($name), $lines, array('name' => $inputname,'id'=>$inputid));
+		
+		//our answerfield draft id key
+		$ret .=	html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $inputname . ':itemid', 'value'=> $draftitemid));
+		
+		//our answerformat
+		$ret .= html_writer::empty_tag('input', array('type' => 'hidden','name' => $inputname . 'format', 'value' => 1));
+	
+	
+		//the context id is the user context for a student submission
+		return $ret . fetchMP3RecorderForSubmission($inputid, $usercontextid ,'user','draft',$draftitemid);
+
+    }
+}
+
 
 /**
  * An poodllrecording format renderer for poodllrecordings for video
@@ -247,42 +296,135 @@ class qtype_poodllrecording_format_video_renderer extends qtype_poodllrecording_
 		$ret .= html_writer::empty_tag('input', array('type' => 'hidden','name' => $inputname . 'format', 'value' => FORMAT_PLAIN));
 
        
-		//the context id $context->id here is wrong, so we just use "5" because it works, why is it wrong ..? J 20120214
+		//the context id is the user context id
 		return $ret . fetchVideoRecorderForSubmission('swf','question',$inputid, $usercontextid ,'user','draft',$draftitemid);
-		return $ret;
 		
     }
 }
 
 /**
- * An poodllrecording format renderer for poodllrecordings for picture *Not implemented yet Justin 20120214*
+ * An poodllrecording format renderer for poodllrecordings for whiteboard pictures
  *
  * @copyright  2012 Justin Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_poodllrecording_format_picture_renderer extends qtype_poodllrecording_format_audio_renderer {
-    /**
-     * @return string the HTML for the textarea.
-     */
-    protected function textarea($response, $lines, $attributes) {
-        $attributes['class'] = $this->class_name() . ' qtype_poodllrecording_response';
-        $attributes['rows'] = $lines;
-        $attributes['cols'] = 60;
-        return html_writer::tag('textarea', s($response), $attributes);
-    }
+
 
     protected function class_name() {
         return 'qtype_poodllrecording_picture';
     }
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        return $this->textarea($step->get_qt_var($name), $lines, array('readonly' => 'readonly'));
+				
+			//fetch file from storage and figure out URL
+    		$storedfiles=$qa->get_last_qt_files($name,$context->id);
+    		foreach ($storedfiles as $sf){
+    			$pathtofile=$qa->get_response_file_url($sf);
+    			break;
+    		}
+
+			return "<img src=\"" . $pathtofile . "\" />";
+	
     }
 
+
     public function response_area_input($name, $qa, $step, $lines, $context) {
-        $inputname = $qa->get_qt_field_name($name);
-        return $this->textarea($step->get_qt_var($name), $lines, array('name' => $inputname)) .
-                html_writer::empty_tag('input', array('type' => 'hidden',
-                    'name' => $inputname . 'format', 'value' => FORMAT_PLAIN));
+    	global $USER;
+    	$usercontextid=get_context_instance(CONTEXT_USER, $USER->id)->id;
+    	
+		//prepare a draft file id for use
+		list($draftitemid, $response) = $this->prepare_response_for_editing( $name, $step, $context);
+		
+		//prepare the tags for our hidden( or shown ) input
+		$inputname = $qa->get_qt_field_name($name);
+		//$inputname="answer";
+		$inputid =  $inputname . '_id';
+		
+		//our answerfield
+		$ret =	html_writer::empty_tag('input', array('type' => 'hidden','id'=>$inputid, 'name' => $inputname));
+		//this is just for testing purposes so we can see the value the recorder is writing
+		//$ret = $this->textarea($step->get_qt_var($name), $lines, array('name' => $inputname,'id'=>$inputid));
+		
+		//our answerfield draft id key
+		$ret .=	html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $inputname . ':itemid', 'value'=> $draftitemid));
+		
+		//our answerformat
+		$ret .= html_writer::empty_tag('input', array('type' => 'hidden','name' => $inputname . 'format', 'value' => 1));
+	
+		//get a handle on the question
+		$q = $qa->get_question();
+	
+		//Get Backimage, if we have one
+		// get file system handle for fetching url to submitted media prompt (if there is one) 
+		$fs = get_file_storage();
+		$files = $fs->get_area_files($q->contextid, 'qtype_poodllrecording', 'backimage', $q->id);
+		$imageurl="";
+		//$ret .= '<br />' . $q->id;
+		//$ret .= '<br />' . $context->id;
+		if($files && count($files)>0){
+			//this if for debugging purposes only
+			/*
+			foreach($files as $file){
+				$mediaurl = $qa->rewrite_pluginfile_urls('@@PLUGINFILE@@/' . $file->get_filename(), $file->get_component(),$file->get_filearea() , $file->get_itemid());
+				$ret .= '<br />' . $mediaurl;
+			}
+			*/
+		
+			$file = array_pop($files);
+			$imageurl = $qa->rewrite_pluginfile_urls('@@PLUGINFILE@@/' . $file->get_filename(), $file->get_component(),$file->get_filearea() , $file->get_itemid());
+		}//end of if
+		
+		//get board size
+		//NB the board size is the size of the drawing canvas, not the widget
+		$boardsize=$q->boardsize;
+		switch($boardsize){
+			case "320x320": $width=320;$height=320;break;
+			case "400x600": $width=400;$height=600;break;
+			case "500x500": $width=500;$height=500;break;
+			case "600x400": $width=600;$height=400;break;
+			case "600x800": $width=600;$height=800;break;
+			case "800x600": $width=800;$height=600;break;
+		}
+		
+		
+		//for debugging purposes we just print this out here
+		//$ret .= $imageurl . " " . $boardsize . " ";
+		
+		//the context id is the user context for a student submission
+		return $ret . $this->prepareWhiteboard($inputid, $usercontextid ,'user','draft',$draftitemid,$width,$height,$imageurl);
+
+    }//end of function
+    
+    private function prepareWhiteboard($updatecontrol, $contextid,$component,$filearea,$itemid,$width=0,$height=0,$backimage=""){
+    	//compensation for borders and control panel
+    	//the board size is the size of the drawing canvas, not the widget
+    	$width = $width + 205;
+    	$height = $height + 20;
+    	$whiteboardString = fetchWhiteboardForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$width,$height,$backimage);
+    	return $whiteboardString;
     }
-}
+
+}//end of class
+/**
+ * An poodllrecording format renderer for poodllrecordings for simple whiteboard picture 
+ *
+ * @copyright  2012 Justin Hunt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_poodllrecording_format_simplepicture_renderer extends qtype_poodllrecording_format_picture_renderer {
+
+
+    protected function class_name() {
+        return 'qtype_poodllrecording_simplepicture';
+    }
+    
+    
+	private function prepareWhiteboard($updatecontrol, $contextid,$component,$filearea,$itemid,$width=0,$height=0,$backimage=""){
+    	$whiteboardString = fetchWhiteboardForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid,$width,$height,$backimage);
+    	return $whiteboardString;
+    }
+}//end of class
+
+
+
