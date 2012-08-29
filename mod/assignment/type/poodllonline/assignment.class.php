@@ -354,9 +354,10 @@ class assignment_poodllonline extends assignment_base {
 		//perform the copy	
 		if($draft_fileinfo){
 			//this changed in 2.3 Justin 201206276 We need to write out a filerecord
-			//$ret = $draft_fileinfo->copy_to_storage($this->context->id, 'mod_assignment', 'submission', $submission->id, '/', $filename);
+			$ret = $draft_fileinfo->copy_to_storage($this->context->id, 'mod_assignment', 'submission', $submission->id, '/', $filename);
 			
 			//create the file record for our new file
+			/*
 			$file_record = array(
 			'userid' => $USER->id,
 			'contextid'=>$this->context->id, 
@@ -371,6 +372,7 @@ class assignment_poodllonline extends assignment_base {
 			'timemodified'=>time()
 			);
 			$ret = $draft_fileinfo->copy_to_storage($file_record);
+			*/
 			
 		}//end of if $original_fileinfo
 
@@ -406,7 +408,8 @@ class assignment_poodllonline extends assignment_base {
      *  and is looked for by pluginfile.php Justin 20110604 
      * For moodle 23, added $forcedownload and $options API change Justin 20120701
       */
-    function send_file($filearea, $args,$forcedownload,array $options=array()) {
+    //function send_file($filearea, $args,$forcedownload,array $options=array()) {
+	 function send_file($filearea, $args) {
         global $CFG, $DB, $USER;
 		ob_start();
         require_once($CFG->libdir.'/filelib.php');
