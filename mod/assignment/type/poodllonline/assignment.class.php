@@ -408,8 +408,8 @@ class assignment_poodllonline extends assignment_base {
      *  and is looked for by pluginfile.php Justin 20110604 
      * For moodle 23, added $forcedownload and $options API change Justin 20120701
       */
-    //function send_file($filearea, $args,$forcedownload,array $options=array()) {
-	 function send_file($filearea, $args) {
+   // function send_file($filearea, $args,$forcedownload,array $options=array()) {
+   function send_file($filearea, $args) {
         global $CFG, $DB, $USER;
 		ob_start();
         require_once($CFG->libdir.'/filelib.php');
