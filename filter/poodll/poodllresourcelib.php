@@ -840,9 +840,8 @@ global $CFG, $USER, $COURSE;
 ///$flvserver = $CFG->poodll_media_server;
 
 //head off to HTML5 logic if mobile
-
-//if(isMobile()){
-if(true){
+if(isMobile()){
+//if(true){
 	return fetch_HTML5RecorderForSubmission($updatecontrol, $contextid,$component,$filearea,$itemid, "image");
 }
 
